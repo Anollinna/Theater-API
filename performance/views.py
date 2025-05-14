@@ -1,9 +1,14 @@
 from datetime import datetime
-
+from theater_api.permissions import IsAdminOrReadOnly
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import mixins, viewsets
 from rest_framework.viewsets import GenericViewSet
 from django.db.models import F, Count
-from performance.models import TheaterHall, Performance, Reservation
+from performance.models import (
+    TheaterHall,
+    Performance,
+    Reservation
+)
 from performance.serializers import (
     TheaterHallSerializer,
     PerformanceSerializer,
@@ -21,10 +26,12 @@ class TheaterHallViewSet(
 ):
     queryset = TheaterHall.objects.all()
     serializer_class = TheaterHallSerializer
+    permission_classes = (IsAdminOrReadOnly, )
 
 
 class PerformanceViewSet(viewsets.ModelViewSet):
     serializer_class = PerformanceSerializer
+    permission_classes = (IsAdminOrReadOnly, )
 
     def get_queryset(self):
         queryset = (
@@ -65,6 +72,7 @@ class ReservationViewSet(
     GenericViewSet
 ):
     serializer_class = ReservationSerializer
+    permission_classes = (IsAuthenticated, )
 
     def get_queryset(self):
         return Reservation.objects.filter(user=self.request.user).prefetch_related(

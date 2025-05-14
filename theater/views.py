@@ -1,5 +1,6 @@
 from rest_framework.exceptions import ValidationError
 from rest_framework import mixins
+from theater_api.permissions import IsAdminOrReadOnly
 from rest_framework.viewsets import GenericViewSet
 from theater.models import Genre, Actor, Play
 from theater.serializers import (
@@ -19,6 +20,7 @@ class GenreViewSet(
 ):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    permission_classes = (IsAdminOrReadOnly,)
 
 
 class ActorViewSet(
@@ -28,6 +30,7 @@ class ActorViewSet(
 ):
     queryset = Actor.objects.all()
     serializer_class = ActorSerializer
+    permission_classes = (IsAdminOrReadOnly,)
 
 
 class PlayViewSet(
@@ -37,6 +40,7 @@ class PlayViewSet(
     GenericViewSet,
 ):
     serializer_class = PlaySerializer
+    permission_classes = (IsAdminOrReadOnly,)
 
     @staticmethod
     def _param_to_ints(qs):

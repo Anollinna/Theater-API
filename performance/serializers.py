@@ -6,8 +6,6 @@ from performance.models import (
     Ticket
 )
 from django.db import transaction
-
-
 from theater.serializers import PlaySerializer
 
 
