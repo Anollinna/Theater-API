@@ -1,5 +1,6 @@
 from rest_framework.exceptions import ValidationError
 from rest_framework import mixins
+from drf_spectacular.utils import extend_schema, OpenApiParameter
 from theater_api.permissions import IsAdminOrReadOnly
 from rest_framework.viewsets import GenericViewSet
 from theater.models import Genre, Actor, Play
@@ -81,3 +82,27 @@ class PlayViewSet(
             return PlayImageSerializer
 
         return PlaySerializer
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="genres",
+                type={"type": "array", "items": {"type": "number"}},
+                description="Filter by Genres id (ex. ?genres=2,3)",
+            ),
+            OpenApiParameter(
+                name="actors",
+                type={"type": "array", "items": {"type": "number"}},
+                description="Filter by Actors id (ex. ?actors=2,3)",
+            ),
+            OpenApiParameter(
+                name="title",
+                type=str,
+                description="Filter by play, partial (ex. ?title=nbrea)",
+                required=False,
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        """List all plays with optional filters by title, genres, and actors."""
+        return super().list(request, *args, **kwargs)
