@@ -1,7 +1,6 @@
 from django.db import models
-
 from theater.models import Play
-from theater_api import settings
+from django.conf import settings
 
 
 class TheaterHall(models.Model):
@@ -42,18 +41,18 @@ class Reservation(models.Model):
 class Ticket(models.Model):
     row = models.IntegerField()
     seat = models.IntegerField()
-    performances = models.ForeignKey(Performance, on_delete=models.CASCADE, related_name="tickets")
-    reservations = models.ForeignKey(Reservation, on_delete=models.CASCADE, related_name="tickets")
+    performance = models.ForeignKey(Performance, on_delete=models.CASCADE, related_name="tickets")
+    reservation = models.ForeignKey(Reservation, on_delete=models.CASCADE, related_name="tickets")
 
     def __str__(self):
         return str(
-            f"{str(self.performances)} (row: {self.row}, seat: {self.seat})"
+            f"{self.performance} (row: {self.row}, seat: {self.seat})"
         )
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["performances", "row", "seat"],
+                fields=["performance", "row", "seat"],
                 name="unique_ticket_per_seat",
             )
         ]
