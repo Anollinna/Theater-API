@@ -1,3 +1,4 @@
+from rest_framework.exceptions import ValidationError
 from rest_framework import mixins
 from rest_framework.viewsets import GenericViewSet
 from theater.models import Genre, Actor, Play
@@ -20,7 +21,7 @@ class GenreViewSet(
     serializer_class = GenreSerializer
 
 
-class ActorsViewSet(
+class ActorViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
     GenericViewSet,
@@ -35,19 +36,22 @@ class PlayViewSet(
     mixins.RetrieveModelMixin,
     GenericViewSet,
 ):
-    queryset = Play.objects.prefetch_related("genres", "actors")
     serializer_class = PlaySerializer
 
     @staticmethod
     def _param_to_ints(qs):
-        return [int(str_id) for str_id in qs.split(",")]
+        try:
+            return [int(str_id) for str_id in qs.split(",")]
+        except ValueError:
+            raise ValidationError(
+                "Query parameters must be integers."
+            )
 
     def get_queryset(self):
+        queryset = Play.objects.prefetch_related("genres", "actors")
         title = self.request.query_params.get("title")
         genres = self.request.query_params.get("genres")
         actors = self.request.query_params.get("actors")
-
-        queryset = self.queryset
 
         if title:
             queryset = queryset.filter(title__icontains=title)
