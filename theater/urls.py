@@ -6,13 +6,13 @@ from theater.views import (
     PlayViewSet
 )
 
+app_name = "theater"
+
 router = routers.DefaultRouter()
 router.register("genres", GenreViewSet)
 router.register("actors", ActorViewSet)
-router.register("plays", PlayViewSet)
+router.register("plays", PlayViewSet, basename="play")
 
 urlpatterns = [
     path("", include(router.urls)),
 ]
-
-app_name = "theater"

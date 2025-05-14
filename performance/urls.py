@@ -6,12 +6,11 @@ from performance.views import (
     ReservationViewSet
 )
 
+app_name = "performance"
 
 router = routers.DefaultRouter()
 router.register("theater_halls", TheaterHallViewSet)
-router.register("performances", PerformanceViewSet)
-router.register("reservations", ReservationViewSet)
+router.register("performances", PerformanceViewSet, basename="performance")
+router.register("reservations", ReservationViewSet, basename="reservation")
 
 urlpatterns = [path("", include(router.urls))]
-
-app_name = "performance"
