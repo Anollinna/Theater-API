@@ -44,7 +44,7 @@ class PerformanceListSerializer(serializers.ModelSerializer):
         source="theater_hall.name",
         read_only=True
     )
-    tickets_available = serializers.IntegerField(
+    available_tickets = serializers.IntegerField(
         read_only=True
     )
 
@@ -56,7 +56,7 @@ class PerformanceListSerializer(serializers.ModelSerializer):
             "play_title",
             "play_image",
             "theater_hall_name",
-            "tickets_available"
+            "available_tickets"
         )
 
 
