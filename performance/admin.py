@@ -6,7 +6,7 @@ from performance.models import (
     Reservation
 )
 
-admin.site.register(TheaterHall)
 admin.site.register(Performance)
+admin.site.register(TheaterHall)
 admin.site.register(Ticket)
 admin.site.register(Reservation)

@@ -15,7 +15,7 @@ from performance.serializers import (
     PerformanceListSerializer,
     PerformanceDetailSerializer,
     ReservationSerializer,
-    ReservationListSerializer,
+    ReservationListSerializer, TicketSerializer,
 )
 
 
@@ -86,4 +86,10 @@ class ReservationViewSet(
         return ReservationSerializer
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        tickets_data = self.request.data.get("tickets", [])
+        reservation = serializer.save(user=self.request.user)
+        for ticket_data in tickets_data:
+            ticket_serializer = TicketSerializer(data=ticket_data)
+            if ticket_serializer.is_valid():
+                ticket_serializer.save(reservation=reservation)
+        return reservation

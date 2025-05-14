@@ -137,14 +137,14 @@ class PerformanceDetailSerializer(serializers.ModelSerializer):
 
 
 class ReservationSerializer(serializers.ModelSerializer):
-    tickets = TicketListSerializer(many=True, read_only=False, allow_empty=False)
+    ticket = TicketSerializer(write_only=True)
 
     class Meta:
         model = Reservation
         fields = (
             "id",
             "created_at",
-            "tickets"
+            "ticket"
         )
 
     def validate_tickets(self, tickets):
@@ -155,17 +155,22 @@ class ReservationSerializer(serializers.ModelSerializer):
         return tickets
 
     def create(self, validated_data):
-        tickets_date = validated_data.pop("tickets")
+        ticket_date = validated_data.pop("ticket")
         user = self.context["request"].user
 
         with transaction.atomic():
             reservation = Reservation.objects.create(user=user)
-            for ticket_date in tickets_date:
-                serializer = TicketSerializer(data=ticket_date)
-                serializer.is_valid(raise_exception=True)
-                serializer.save(reservation=reservation)
+            Ticket.objects.create(reservation=reservation, **ticket_date)
             return reservation
 
 
 class ReservationListSerializer(serializers.ModelSerializer):
     tickets = TicketListSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Reservation
+        fields = (
+            "id",
+            "created_at",
+            "tickets"
+        )
