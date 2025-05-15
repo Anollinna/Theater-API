@@ -1,3 +1,7 @@
+from requests.models import Response
+from rest_framework.decorators import action
+from rest_framework import status
+from rest_framework.permissions import IsAdminUser
 from rest_framework.exceptions import ValidationError
 from rest_framework import mixins
 from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter
@@ -116,3 +120,23 @@ class PlayViewSet(
             return PlayImageSerializer
 
         return PlaySerializer
+
+    @extend_schema(
+        summary="Upload an image for the play",
+        request=PlayImageSerializer,
+        responses={200: PlayImageSerializer}
+    )
+    @action(
+        methods=["POST"],
+        detail=True,
+        url_path="upload-image",
+        permission_classes=[IsAdminUser],
+    )
+    def upload_image(self, request, pk=None):
+        play = self.get_object()
+        serializer = self.get_serializer(play, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
