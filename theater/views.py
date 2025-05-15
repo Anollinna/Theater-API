@@ -1,6 +1,6 @@
 from rest_framework.exceptions import ValidationError
 from rest_framework import mixins
-from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter
 from theater_api.permissions import IsAdminOrReadOnly
 from rest_framework.viewsets import GenericViewSet
 from theater.models import Genre, Actor, Play
@@ -14,6 +14,10 @@ from theater.serializers import (
 )
 
 
+@extend_schema_view(
+    list=extend_schema(summary="List all genres"),
+    create=extend_schema(summary="Create a new genre"),
+)
 class GenreViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
@@ -24,6 +28,10 @@ class GenreViewSet(
     permission_classes = (IsAdminOrReadOnly,)
 
 
+@extend_schema_view(
+    list=extend_schema(summary="List all actors"),
+    create=extend_schema(summary="Create a new actor"),
+)
 class ActorViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
@@ -34,6 +42,32 @@ class ActorViewSet(
     permission_classes = (IsAdminOrReadOnly,)
 
 
+@extend_schema_view(
+    list=extend_schema(
+        summary="List all plays with filters",
+        parameters=[
+            OpenApiParameter(
+                name="genres",
+                type={"type": "array", "items": {"type": "number"}},
+                description="Filter by genre IDs (e.g., ?genres=1,2)"
+            ),
+            OpenApiParameter(
+                name="actors",
+                type={"type": "array", "items": {"type": "number"}},
+                description="Filter by actor IDs (e.g., ?actors=3,4)"
+            ),
+            OpenApiParameter(
+                name="title",
+                type=str,
+                description="Filter by partial title (e.g., ?title=king)",
+                required=False
+            ),
+        ]
+
+    ),
+    retrieve=extend_schema(summary="Retrieve play details"),
+    create=extend_schema(summary="Create a new play"),
+)
 class PlayViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
@@ -82,27 +116,3 @@ class PlayViewSet(
             return PlayImageSerializer
 
         return PlaySerializer
-
-    @extend_schema(
-        parameters=[
-            OpenApiParameter(
-                name="genres",
-                type={"type": "array", "items": {"type": "number"}},
-                description="Filter by Genres id (ex. ?genres=2,3)",
-            ),
-            OpenApiParameter(
-                name="actors",
-                type={"type": "array", "items": {"type": "number"}},
-                description="Filter by Actors id (ex. ?actors=2,3)",
-            ),
-            OpenApiParameter(
-                name="title",
-                type=str,
-                description="Filter by play, partial (ex. ?title=nbrea)",
-                required=False,
-            ),
-        ]
-    )
-    def list(self, request, *args, **kwargs):
-        """List all plays with optional filters by title, genres, and actors."""
-        return super().list(request, *args, **kwargs)
