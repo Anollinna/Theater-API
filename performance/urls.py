@@ -9,7 +9,7 @@ from performance.views import (
 app_name = "performance"
 
 router = routers.DefaultRouter()
-router.register("theater_halls", TheaterHallViewSet)
+router.register("theater_halls", TheaterHallViewSet, basename="theater_hall")
 router.register("performances", PerformanceViewSet, basename="performance")
 router.register("reservations", ReservationViewSet, basename="reservation")
 
