@@ -9,8 +9,8 @@ from theater.views import (
 app_name = "theater"
 
 router = routers.DefaultRouter()
-router.register("genres", GenreViewSet)
-router.register("actors", ActorViewSet)
+router.register("genres", GenreViewSet, basename="genre")
+router.register("actors", ActorViewSet, basename="actor")
 router.register("plays", PlayViewSet, basename="play")
 
 urlpatterns = [

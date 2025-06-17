@@ -1,7 +1,7 @@
 from datetime import datetime
 from theater_api.permissions import IsAdminOrReadOnly
 from rest_framework.permissions import IsAuthenticated
-from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter
+from drf_spectacular.utils import  extend_schema_view
 from rest_framework import mixins, viewsets
 from rest_framework.viewsets import GenericViewSet
 from django.db.models import F, Count
@@ -16,14 +16,16 @@ from performance.serializers import (
     PerformanceListSerializer,
     PerformanceDetailSerializer,
     ReservationSerializer,
-    ReservationListSerializer, TicketSerializer,
+    ReservationListSerializer,
+)
+from performance.schemas import (
+    theater_hall_schema,
+    performance_schema,
+    reservation_schema
 )
 
 
-@extend_schema_view(
-    list=extend_schema(summary="List all theater halls"),
-    create=extend_schema(summary="Create a new theater hall"),
-)
+@extend_schema_view(**theater_hall_schema)
 class TheaterHallViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
@@ -34,30 +36,7 @@ class TheaterHallViewSet(
     permission_classes = (IsAdminOrReadOnly, )
 
 
-@extend_schema_view(
-    list=extend_schema(
-        summary="List all performances",
-        parameters=[
-            OpenApiParameter(
-                name="date",
-                type=str,
-                description="Filter by date (YYYY-MM-DD)",
-                required=False,
-            ),
-            OpenApiParameter(
-                name="play",
-                type=str,
-                description="Filter by play ID",
-                required=False,
-            ),
-        ]
-    ),
-    retrieve=extend_schema(summary="Get performance details"),
-    create=extend_schema(summary="Create a new performance"),
-    update=extend_schema(summary="Update a performance"),
-    partial_update=extend_schema(summary="Partially update a performance"),
-    destroy=extend_schema(summary="Delete a performance"),
-)
+@extend_schema_view(**performance_schema)
 class PerformanceViewSet(viewsets.ModelViewSet):
     serializer_class = PerformanceSerializer
     permission_classes = (IsAdminOrReadOnly, )
@@ -95,14 +74,7 @@ class PerformanceViewSet(viewsets.ModelViewSet):
         return PerformanceSerializer
 
 
-@extend_schema_view(
-    list=extend_schema(summary="List current user`s reservations"),
-    create=extend_schema(
-        summary="Create a reservation with tickets",
-        request=ReservationSerializer,
-        responses={201: ReservationSerializer}
-    ),
-)
+@extend_schema_view(**reservation_schema)
 class ReservationViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
